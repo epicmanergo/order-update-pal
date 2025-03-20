@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { findOrderByNumber, updateOrder } from '@/utils/ordersData';
+import { getOrderByNumber, updateOrder } from '@/utils/ordersData';
 import OrderForm from '@/components/OrderForm';
 import { toast } from 'sonner';
 import { AlertCircle } from 'lucide-react';
@@ -9,12 +9,12 @@ import { AlertCircle } from 'lucide-react';
 const UpdateOrder = () => {
   const { orderNumber } = useParams<{ orderNumber: string }>();
   const navigate = useNavigate();
-  const [order, setOrder] = useState(orderNumber ? findOrderByNumber(orderNumber) : null);
+  const [order, setOrder] = useState(orderNumber ? getOrderByNumber(orderNumber) : null);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (orderNumber) {
-      const foundOrder = findOrderByNumber(orderNumber);
+      const foundOrder = getOrderByNumber(orderNumber);
       setOrder(foundOrder);
       
       if (!foundOrder) {

@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { findOrderByNumber } from '@/utils/ordersData';
+import { getOrderByNumber } from '@/utils/ordersData';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import OrderDetails from '@/components/OrderDetails';
@@ -9,7 +9,7 @@ import { Package, SearchIcon } from 'lucide-react';
 
 const Index = () => {
   const [orderNumber, setOrderNumber] = useState('');
-  const [searchedOrder, setSearchedOrder] = useState<ReturnType<typeof findOrderByNumber>>(null);
+  const [searchedOrder, setSearchedOrder] = useState<ReturnType<typeof getOrderByNumber>>(null);
   const [isSearching, setIsSearching] = useState(false);
 
   const handleSearch = (e: React.FormEvent) => {
@@ -24,7 +24,7 @@ const Index = () => {
     
     // Simulate API delay
     setTimeout(() => {
-      const foundOrder = findOrderByNumber(orderNumber);
+      const foundOrder = getOrderByNumber(orderNumber);
       setSearchedOrder(foundOrder);
       
       if (!foundOrder) {
