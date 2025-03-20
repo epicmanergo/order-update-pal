@@ -15,10 +15,12 @@ import {
   Clock,
   Truck,
   AlertTriangle,
-  Check
+  Check,
+  LogOut
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 
@@ -36,13 +38,19 @@ const Admin = () => {
   const handleCreateOrder = (orderData: Parameters<typeof addOrder>[0]) => {
     try {
       const newOrder = addOrder(orderData);
-      toast.success('Order created successfully');
+      toast.success('Commande créée avec succès');
       setOrders(getAllOrders());
       setShowForm(false);
     } catch (error) {
-      toast.error('Failed to create order');
+      toast.error('Échec de la création de la commande');
       console.error(error);
     }
+  };
+  
+  const handleLogout = () => {
+    localStorage.removeItem('isAuthenticated');
+    toast.success('Vous êtes déconnecté');
+    navigate('/');
   };
   
   const getStatusIcon = (status: string) => {
@@ -65,6 +73,16 @@ const Admin = () => {
     }
   };
   
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'processing': return 'En traitement';
+      case 'shipped': return 'Expédié';
+      case 'delayed': return 'Retardé';
+      case 'delivered': return 'Livré';
+      default: return status;
+    }
+  };
+  
   const filteredOrders = orders.filter(order => 
     order.orderNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
     order.customerName.toLowerCase().includes(searchTerm.toLowerCase())
@@ -72,7 +90,7 @@ const Admin = () => {
   
   const formatDate = (dateString: string) => {
     try {
-      return format(new Date(dateString), 'MMM d, yyyy');
+      return format(new Date(dateString), 'd MMM yyyy', { locale: fr });
     } catch (error) {
       return dateString;
     }
@@ -85,30 +103,41 @@ const Admin = () => {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
             <div>
               <h1 className="text-3xl font-bold tracking-tight animate-slide-in">
-                Order Management
+                Gestion des Commandes
               </h1>
               <p className="text-muted-foreground mt-1 animate-fade-in">
-                View, create, and update order information
+                Afficher, créer et mettre à jour les informations de commande
               </p>
             </div>
             
-            <Button 
-              onClick={() => setShowForm(!showForm)} 
-              className="animate-blur-in"
-            >
-              {showForm ? 'Cancel' : (
-                <>
-                  <Plus className="mr-1 h-4 w-4" />
-                  New Order
-                </>
-              )}
-            </Button>
+            <div className="flex gap-2">
+              <Button 
+                variant="outline"
+                onClick={handleLogout}
+                className="animate-blur-in text-red-500 hover:text-red-700 hover:bg-red-50 border-red-200"
+              >
+                <LogOut className="mr-1 h-4 w-4" />
+                Déconnexion
+              </Button>
+              
+              <Button 
+                onClick={() => setShowForm(!showForm)} 
+                className="animate-blur-in"
+              >
+                {showForm ? 'Annuler' : (
+                  <>
+                    <Plus className="mr-1 h-4 w-4" />
+                    Nouvelle Commande
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
           
           <Tabs defaultValue="orders" className="w-full animate-blur-in">
             <TabsList className="mb-6">
-              <TabsTrigger value="orders">All Orders</TabsTrigger>
-              <TabsTrigger value="add" onClick={() => setShowForm(true)}>Add New Order</TabsTrigger>
+              <TabsTrigger value="orders">Toutes les Commandes</TabsTrigger>
+              <TabsTrigger value="add" onClick={() => setShowForm(true)}>Ajouter une Commande</TabsTrigger>
             </TabsList>
             
             <TabsContent value="orders" className="space-y-4">
@@ -116,7 +145,7 @@ const Admin = () => {
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    placeholder="Search orders by number or customer name..."
+                    placeholder="Rechercher par numéro de commande ou nom du client..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-9 input-focus-ring"
@@ -127,11 +156,11 @@ const Admin = () => {
               {filteredOrders.length === 0 ? (
                 <div className="bg-muted/30 rounded-lg p-8 text-center">
                   <Package className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-medium">No Orders Found</h3>
+                  <h3 className="text-lg font-medium">Aucune Commande Trouvée</h3>
                   <p className="text-muted-foreground mt-2">
                     {searchTerm 
-                      ? `No orders match "${searchTerm}"`
-                      : "You haven't created any orders yet."}
+                      ? `Aucune commande ne correspond à "${searchTerm}"`
+                      : "Vous n'avez pas encore créé de commandes."}
                   </p>
                   {!searchTerm && (
                     <Button 
@@ -139,7 +168,7 @@ const Admin = () => {
                       className="mt-4"
                     >
                       <Plus className="mr-1 h-4 w-4" />
-                      Create Your First Order
+                      Créer Votre Première Commande
                     </Button>
                   )}
                 </div>
@@ -149,10 +178,10 @@ const Admin = () => {
                     <table className="w-full">
                       <thead>
                         <tr className="border-b">
-                          <th className="text-left p-4 font-semibold text-muted-foreground">Order Number</th>
-                          <th className="text-left p-4 font-semibold text-muted-foreground">Customer</th>
-                          <th className="text-left p-4 font-semibold text-muted-foreground">Status</th>
-                          <th className="text-left p-4 font-semibold text-muted-foreground">Delivery Date</th>
+                          <th className="text-left p-4 font-semibold text-muted-foreground">N° Commande</th>
+                          <th className="text-left p-4 font-semibold text-muted-foreground">Client</th>
+                          <th className="text-left p-4 font-semibold text-muted-foreground">Statut</th>
+                          <th className="text-left p-4 font-semibold text-muted-foreground">Date de Livraison</th>
                           <th className="text-right p-4 font-semibold text-muted-foreground">Actions</th>
                         </tr>
                       </thead>
@@ -172,7 +201,7 @@ const Admin = () => {
                                 getStatusClass(order.status)
                               )}>
                                 {getStatusIcon(order.status)}
-                                <span className="ml-1 capitalize">{order.status}</span>
+                                <span className="ml-1">{getStatusText(order.status)}</span>
                               </div>
                             </td>
                             <td className="p-4">
@@ -189,7 +218,7 @@ const Admin = () => {
                                 className="text-muted-foreground hover:text-foreground"
                               >
                                 <PenLine className="h-4 w-4 mr-1" />
-                                Update
+                                Modifier
                               </Button>
                             </td>
                           </tr>
@@ -204,7 +233,7 @@ const Admin = () => {
             <TabsContent value="add">
               {showForm && (
                 <div className="glassmorphism rounded-xl overflow-hidden p-6">
-                  <h2 className="text-xl font-semibold mb-6">Create New Order</h2>
+                  <h2 className="text-xl font-semibold mb-6">Créer une Nouvelle Commande</h2>
                   <OrderForm onSubmit={handleCreateOrder} />
                 </div>
               )}

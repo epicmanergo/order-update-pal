@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
+import { fr } from 'date-fns/locale';
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 
 interface OrderFormProps {
@@ -37,7 +38,7 @@ interface OrderFormProps {
 const OrderForm: React.FC<OrderFormProps> = ({ 
   initialData, 
   onSubmit,
-  submitButtonText = 'Create Order'
+  submitButtonText = 'Créer la Commande'
 }) => {
   const navigate = useNavigate();
   const [date, setDate] = useState<Date | undefined>(
@@ -83,13 +84,13 @@ const OrderForm: React.FC<OrderFormProps> = ({
     
     // Basic validation
     if (!formData.orderNumber || !formData.customerName || !formData.deliveryDate) {
-      toast.error('Please fill in all required fields');
+      toast.error('Veuillez remplir tous les champs obligatoires');
       return;
     }
     
     // If status is delayed, delay reason is required
     if (formData.status === 'delayed' && !formData.delayReason) {
-      toast.error('Please provide a delay reason');
+      toast.error('Veuillez indiquer la raison du retard');
       return;
     }
     
@@ -112,12 +113,12 @@ const OrderForm: React.FC<OrderFormProps> = ({
         <div className="space-y-2">
           <Label htmlFor="orderNumber" className="text-base flex items-center gap-1.5">
             <Package className="h-4 w-4" />
-            Order Number <span className="text-red-500">*</span>
+            Numéro de Commande <span className="text-red-500">*</span>
           </Label>
           <Input
             id="orderNumber"
             name="orderNumber"
-            placeholder="e.g. ORD-2023-001"
+            placeholder="ex: ORD-2023-001"
             className="input-focus-ring"
             value={formData.orderNumber}
             onChange={handleChange}
@@ -130,12 +131,12 @@ const OrderForm: React.FC<OrderFormProps> = ({
           <div className="space-y-2">
             <Label htmlFor="customerName" className="text-base flex items-center gap-1.5">
               <User className="h-4 w-4" />
-              Customer Name <span className="text-red-500">*</span>
+              Nom du Client <span className="text-red-500">*</span>
             </Label>
             <Input
               id="customerName"
               name="customerName"
-              placeholder="Full Name"
+              placeholder="Nom Complet"
               className="input-focus-ring"
               value={formData.customerName}
               onChange={handleChange}
@@ -146,13 +147,13 @@ const OrderForm: React.FC<OrderFormProps> = ({
           <div className="space-y-2">
             <Label htmlFor="customerEmail" className="text-base flex items-center gap-1.5">
               <AtSign className="h-4 w-4" />
-              Email Address
+              Adresse Email
             </Label>
             <Input
               id="customerEmail"
               name="customerEmail"
               type="email"
-              placeholder="customer@example.com"
+              placeholder="client@exemple.com"
               className="input-focus-ring"
               value={formData.customerEmail}
               onChange={handleChange}
@@ -162,12 +163,12 @@ const OrderForm: React.FC<OrderFormProps> = ({
           <div className="space-y-2">
             <Label htmlFor="customerPhone" className="text-base flex items-center gap-1.5">
               <Phone className="h-4 w-4" />
-              Phone Number
+              Numéro de Téléphone
             </Label>
             <Input
               id="customerPhone"
               name="customerPhone"
-              placeholder="e.g. 555-123-4567"
+              placeholder="ex: 06 12 34 56 78"
               className="input-focus-ring"
               value={formData.customerPhone}
               onChange={handleChange}
@@ -177,7 +178,7 @@ const OrderForm: React.FC<OrderFormProps> = ({
           <div className="space-y-2">
             <Label className="text-base flex items-center gap-1.5">
               <Calendar className="h-4 w-4" />
-              Delivery Date <span className="text-red-500">*</span>
+              Date de Livraison <span className="text-red-500">*</span>
             </Label>
             <Popover>
               <PopoverTrigger asChild>
@@ -189,7 +190,7 @@ const OrderForm: React.FC<OrderFormProps> = ({
                   )}
                 >
                   <Calendar className="mr-2 h-4 w-4" />
-                  {date ? format(date, 'PPP') : <span>Select a date</span>}
+                  {date ? format(date, 'd MMMM yyyy', { locale: fr }) : <span>Sélectionner une date</span>}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -199,6 +200,7 @@ const OrderForm: React.FC<OrderFormProps> = ({
                   onSelect={handleDateSelect}
                   initialFocus
                   className={cn("p-3 pointer-events-auto")}
+                  locale={fr}
                 />
               </PopoverContent>
             </Popover>
@@ -206,7 +208,7 @@ const OrderForm: React.FC<OrderFormProps> = ({
         </div>
         
         <div className="space-y-3">
-          <Label className="text-base">Order Status</Label>
+          <Label className="text-base">Statut de la Commande</Label>
           <RadioGroup
             defaultValue={formData.status}
             value={formData.status}
@@ -217,28 +219,28 @@ const OrderForm: React.FC<OrderFormProps> = ({
               <RadioGroupItem value="processing" id="processing" />
               <Label htmlFor="processing" className="flex items-center gap-1.5">
                 <Clock className="h-4 w-4 text-blue-500" />
-                <span>Processing</span>
+                <span>En traitement</span>
               </Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="shipped" id="shipped" />
               <Label htmlFor="shipped" className="flex items-center gap-1.5">
                 <Truck className="h-4 w-4 text-amber-500" />
-                <span>Shipped</span>
+                <span>Expédié</span>
               </Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="delayed" id="delayed" />
               <Label htmlFor="delayed" className="flex items-center gap-1.5">
                 <AlertTriangle className="h-4 w-4 text-red-500" />
-                <span>Delayed</span>
+                <span>Retardé</span>
               </Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="delivered" id="delivered" />
               <Label htmlFor="delivered" className="flex items-center gap-1.5">
                 <Check className="h-4 w-4 text-green-500" />
-                <span>Delivered</span>
+                <span>Livré</span>
               </Label>
             </div>
           </RadioGroup>
@@ -248,12 +250,12 @@ const OrderForm: React.FC<OrderFormProps> = ({
           <div className="space-y-2 animate-fade-in">
             <Label htmlFor="delayReason" className="text-base flex items-center gap-1.5">
               <AlertTriangle className="h-4 w-4 text-red-500" />
-              Reason for Delay <span className="text-red-500">*</span>
+              Raison du Retard <span className="text-red-500">*</span>
             </Label>
             <Textarea
               id="delayReason"
               name="delayReason"
-              placeholder="Explain why the order is delayed..."
+              placeholder="Expliquez pourquoi la commande est retardée..."
               rows={3}
               className="input-focus-ring"
               value={formData.delayReason}
@@ -275,7 +277,7 @@ const OrderForm: React.FC<OrderFormProps> = ({
           onClick={() => navigate(-1)}
           className="sm:flex-1"
         >
-          Cancel
+          Annuler
         </Button>
       </div>
     </form>

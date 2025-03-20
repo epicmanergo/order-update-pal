@@ -4,6 +4,7 @@ import { Order } from '@/utils/ordersData';
 import { Calendar, Package, Mail, Phone, Clock, AlertTriangle, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 interface OrderDetailsProps {
   order: Order;
@@ -30,6 +31,16 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order }) => {
     }
   };
 
+  const getStatusText = (status: Order['status']) => {
+    switch (status) {
+      case 'processing': return 'En traitement';
+      case 'shipped': return 'Expédié';
+      case 'delayed': return 'Retardé';
+      case 'delivered': return 'Livré';
+      default: return status;
+    }
+  };
+
   const formatDate = (dateString: string) => {
     try {
       // Try to parse as ISO date
@@ -38,7 +49,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order }) => {
       if (isNaN(date.getTime())) {
         return dateString; // Return original if not valid date
       }
-      return format(date, 'MMMM d, yyyy');
+      return format(date, 'd MMMM yyyy', { locale: fr });
     } catch (error) {
       return dateString; // Return original string if parsing fails
     }
@@ -49,7 +60,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order }) => {
       <div className="glassmorphism rounded-xl overflow-hidden p-6 space-y-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <div className="text-sm font-medium text-muted-foreground">Order Number</div>
+            <div className="text-sm font-medium text-muted-foreground">Numéro de Commande</div>
             <h2 className="text-2xl font-bold">{order.orderNumber}</h2>
           </div>
           
@@ -58,14 +69,14 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order }) => {
             getStatusColor(order.status)
           )}>
             {getStatusIcon(order.status)}
-            <span className="capitalize">{order.status}</span>
+            <span>{getStatusText(order.status)}</span>
           </div>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-4">
             <div>
-              <div className="text-sm font-medium text-muted-foreground">Customer</div>
+              <div className="text-sm font-medium text-muted-foreground">Client</div>
               <div className="text-lg font-semibold">{order.customerName}</div>
             </div>
             
@@ -84,7 +95,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order }) => {
           
           <div className="space-y-4">
             <div>
-              <div className="text-sm font-medium text-muted-foreground">Expected Delivery</div>
+              <div className="text-sm font-medium text-muted-foreground">Livraison Prévue</div>
               <div className="flex items-center gap-2">
                 <Calendar className="h-5 w-5 text-primary" />
                 <span className="text-lg font-semibold">{formatDate(order.deliveryDate)}</span>
@@ -96,7 +107,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order }) => {
                 <div className="flex items-start gap-2">
                   <AlertTriangle className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" />
                   <div>
-                    <div className="font-medium text-amber-700">Delay Information</div>
+                    <div className="font-medium text-amber-700">Information de Retard</div>
                     <p className="text-amber-600 text-sm">{order.delayReason}</p>
                   </div>
                 </div>
@@ -107,8 +118,8 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order }) => {
         
         <div className="text-xs text-muted-foreground pt-4 border-t border-border">
           <div className="flex flex-wrap gap-x-6 gap-y-1">
-            <span>Created: {formatDate(order.createdAt)}</span>
-            <span>Last Updated: {formatDate(order.updatedAt)}</span>
+            <span>Créée le: {formatDate(order.createdAt)}</span>
+            <span>Dernière mise à jour: {formatDate(order.updatedAt)}</span>
           </div>
         </div>
       </div>

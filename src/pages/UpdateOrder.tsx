@@ -1,78 +1,57 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getOrderByNumber, updateOrder } from '@/utils/ordersData';
-import { toast } from 'sonner';
+import { findOrderByNumber, updateOrder } from '@/utils/ordersData';
 import OrderForm from '@/components/OrderForm';
-import { ArrowLeft, PenLine } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
+import { AlertCircle } from 'lucide-react';
 
 const UpdateOrder = () => {
   const { orderNumber } = useParams<{ orderNumber: string }>();
   const navigate = useNavigate();
-  const [order, setOrder] = useState(orderNumber ? getOrderByNumber(orderNumber) : undefined);
-  const [isLoading, setIsLoading] = useState(true);
-  
+  const [order, setOrder] = useState(orderNumber ? findOrderByNumber(orderNumber) : null);
+  const [isLoading, setIsLoading] = useState(false);
+
   useEffect(() => {
     if (orderNumber) {
-      // Simulate loading delay
-      const timer = setTimeout(() => {
-        const foundOrder = getOrderByNumber(orderNumber);
-        setOrder(foundOrder);
-        setIsLoading(false);
-        
-        if (!foundOrder) {
-          toast.error('Order not found');
-        }
-      }, 500);
+      const foundOrder = findOrderByNumber(orderNumber);
+      setOrder(foundOrder);
       
-      return () => clearTimeout(timer);
-    }
-  }, [orderNumber]);
-  
-  const handleUpdate = (formData: Parameters<typeof updateOrder>[1]) => {
-    if (!orderNumber) return;
-    
-    try {
-      const updated = updateOrder(orderNumber, formData);
-      
-      if (updated) {
-        toast.success('Order updated successfully');
+      if (!foundOrder) {
+        toast.error(`Commande "${orderNumber}" introuvable`);
         navigate('/admin');
-      } else {
-        toast.error('Failed to update order');
       }
-    } catch (error) {
-      toast.error('An error occurred while updating the order');
-      console.error(error);
     }
+  }, [orderNumber, navigate]);
+
+  const handleUpdateOrder = (formData: Parameters<typeof updateOrder>[1]) => {
+    if (!order) return;
+    
+    setIsLoading(true);
+    
+    setTimeout(() => {
+      try {
+        updateOrder(order.id, formData);
+        toast.success('Commande mise à jour avec succès');
+        navigate('/admin');
+      } catch (error) {
+        toast.error('Échec de la mise à jour de la commande');
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+      }
+    }, 500);
   };
-  
-  if (isLoading) {
-    return (
-      <div className="min-h-screen pt-20 flex items-center justify-center">
-        <div className="text-center animate-pulse">
-          <div className="h-8 w-32 bg-muted rounded-md mx-auto mb-4"></div>
-          <div className="h-6 w-64 bg-muted rounded-md mx-auto"></div>
-        </div>
-      </div>
-    );
-  }
-  
+
   if (!order) {
     return (
-      <div className="min-h-screen pt-20">
-        <div className="content-container">
-          <div className="max-w-lg mx-auto glassmorphism rounded-xl p-8 text-center">
-            <h2 className="text-2xl font-bold mb-4">Order Not Found</h2>
-            <p className="mb-6 text-muted-foreground">
-              We couldn't find an order with the number <strong>{orderNumber}</strong>.
-            </p>
-            <Button onClick={() => navigate('/admin')}>
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Return to Admin Panel
-            </Button>
-          </div>
+      <div className="min-h-screen pt-20 flex justify-center">
+        <div className="bg-muted/30 rounded-lg p-8 text-center max-w-lg mx-auto">
+          <AlertCircle className="h-12 w-12 mx-auto text-red-500 mb-4" />
+          <h3 className="text-lg font-medium">Commande Introuvable</h3>
+          <p className="text-muted-foreground mt-2">
+            La commande que vous recherchez n'existe pas ou a été supprimée.
+          </p>
         </div>
       </div>
     );
@@ -80,31 +59,21 @@ const UpdateOrder = () => {
 
   return (
     <div className="min-h-screen pt-20">
-      <div className="content-container">
-        <div className="mb-4">
-          <Button 
-            variant="ghost" 
-            onClick={() => navigate('/admin')}
-            className="mb-4"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" /> 
-            Back to Admin
-          </Button>
-          
-          <h1 className="text-3xl font-bold tracking-tight animate-slide-in flex items-center gap-2">
-            <PenLine className="h-6 w-6" /> 
-            Update Order
+      <div className="content-container max-w-3xl">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold tracking-tight animate-slide-in">
+            Mettre à Jour la Commande
           </h1>
-          <p className="text-muted-foreground animate-fade-in">
-            Update details for order {order.orderNumber}
+          <p className="text-muted-foreground mt-1 animate-fade-in">
+            Modifier les détails de la commande {order.orderNumber}
           </p>
         </div>
         
-        <div className="glassmorphism rounded-xl overflow-hidden p-6 max-w-4xl">
+        <div className="glassmorphism rounded-xl overflow-hidden p-6">
           <OrderForm 
             initialData={order} 
-            onSubmit={handleUpdate}
-            submitButtonText="Update Order"
+            onSubmit={handleUpdateOrder}
+            submitButtonText={isLoading ? 'Mise à jour...' : 'Mettre à Jour la Commande'}
           />
         </div>
       </div>
