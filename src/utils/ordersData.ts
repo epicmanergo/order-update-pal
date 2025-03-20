@@ -63,8 +63,9 @@ export const addOrder = (order: Omit<Order, 'id' | 'createdAt' | 'updatedAt'>): 
 };
 
 // Update order
-export const updateOrder = (orderNumber: string, updates: Partial<Order>): Order | undefined => {
-  const index = orders.findIndex(order => order.orderNumber.toLowerCase() === orderNumber.toLowerCase());
+export const updateOrder = (orderId: string, updates: Partial<Order>): Order | undefined => {
+  // Find the order by id, not by order number
+  const index = orders.findIndex(order => order.id === orderId);
   
   if (index === -1) return undefined;
   
