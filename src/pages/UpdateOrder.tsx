@@ -31,9 +31,15 @@ const UpdateOrder = () => {
     
     setTimeout(() => {
       try {
-        updateOrder(order.id, formData);
-        toast.success('Commande mise à jour avec succès');
-        navigate('/admin');
+        // Pass the order.id, not orderNumber to updateOrder function
+        const updatedOrder = updateOrder(order.id, formData);
+        
+        if (updatedOrder) {
+          toast.success('Commande mise à jour avec succès');
+          navigate('/admin');
+        } else {
+          toast.error('Échec de la mise à jour de la commande');
+        }
       } catch (error) {
         toast.error('Échec de la mise à jour de la commande');
         console.error(error);
