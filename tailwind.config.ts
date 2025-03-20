@@ -53,6 +53,20 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+				orange: {
+					DEFAULT: '#F97316',
+					50: '#FEF5ED',
+					100: '#FDEAD8',
+					200: '#FAD0B0',
+					300: '#F8B588',
+					400: '#F59A5F',
+					500: '#F97316', // Main orange
+					600: '#D95C06',
+					700: '#A74705',
+					800: '#753103',
+					900: '#421B02',
+					950: '#2B1101'
+				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
@@ -101,6 +115,10 @@ export default {
 				'blur-out': {
 					from: { filter: 'blur(0)', opacity: '1' },
 					to: { filter: 'blur(8px)', opacity: '0' }
+				},
+				'pulse-slow': {
+					'0%, 100%': { opacity: '0.6' },
+					'50%': { opacity: '0.3' }
 				}
 			},
 			animation: {
@@ -111,7 +129,8 @@ export default {
 				'slide-in': 'slide-in 0.6s ease-out',
 				'slide-out': 'slide-out 0.5s ease-out',
 				'blur-in': 'blur-in 0.6s ease-out',
-				'blur-out': 'blur-out 0.5s ease-out'
+				'blur-out': 'blur-out 0.5s ease-out',
+				'pulse-slow': 'pulse-slow 2s ease-in-out infinite'
 			}
 		}
 	},

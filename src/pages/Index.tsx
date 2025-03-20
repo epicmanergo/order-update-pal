@@ -38,7 +38,7 @@ const Index = () => {
   return (
     <div className="min-h-screen pt-20 md:pt-36">
       <div className="content-container text-center max-w-3xl">
-        <h1 className="text-4xl font-bold tracking-tight md:text-5xl animate-slide-in">
+        <h1 className="text-4xl font-bold tracking-tight md:text-5xl animate-slide-in text-orange-500">
           Suivi de Commande
         </h1>
         <p className="mt-4 text-lg text-muted-foreground md:text-xl animate-fade-in delay-150">
@@ -54,14 +54,14 @@ const Index = () => {
             <Input
               value={orderNumber}
               onChange={(e) => setOrderNumber(e.target.value)}
-              className="pl-10 input-focus-ring w-full"
+              className="pl-10 input-focus-ring w-full bg-gray-800 border-gray-700"
               placeholder="Numéro de commande (ex: ORD-2023-001)"
             />
           </div>
           <Button 
             type="submit" 
             disabled={isSearching}
-            className="w-full sm:w-auto"
+            className="w-full sm:w-auto bg-orange-500 hover:bg-orange-600 text-gray-900"
           >
             {isSearching ? 'Recherche...' : 'Suivre ma commande'}
           </Button>
